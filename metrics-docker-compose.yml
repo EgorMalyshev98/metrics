@@ -50,6 +50,7 @@ services:
   nodeexporter:
     image: prom/node-exporter:v1.5.0
     container_name: nodeexporter
+    user: "root"
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
@@ -63,14 +64,14 @@ services:
     # ports: [9100]
     expose:
       - '9100'
-
     labels:
-      org.label-schema.group: "monitoring"
+      - "org.label-schema.group=monitoring"
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.47.1
     container_name: cadvisor
     privileged: true
+    user: "root"
     devices:
       - /dev/kmsg:/dev/kmsg
     volumes:
@@ -99,11 +100,13 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
       - GF_USERS_ALLOW_SIGN_UP=false
     restart: unless-stopped
-    ports:
-      - "3000:3000"
-
+    expose:
+      - "3000"
     labels:
-      org.label-schema.group: "monitoring"
+      - "org.label-schema.group=monitoring"
+      - "traefik.enable=true"
+      - "traefik.http.routers.grafana.entrypoints=web"
+      - "traefik.http.routers.grafana.rule=Host(`metrics.oup-analytics.ru`)"
 
   # pushgateway:
   #   image: prom/pushgateway:v1.5.1
