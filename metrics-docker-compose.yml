@@ -28,7 +28,6 @@ services:
     # ports: [9090]
     expose:
       - '9090'
-
     labels:
       org.label-schema.group: "monitoring"
 
@@ -37,6 +36,7 @@ services:
     container_name: alertmanager
     volumes:
       - ./alertmanager:/etc/alertmanager
+      - prometheus_data:/alertmanager
     command:
       - '--config.file=/etc/alertmanager/config.yml'
       - '--storage.path=/alertmanager'
