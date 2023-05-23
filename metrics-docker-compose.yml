@@ -25,7 +25,9 @@ services:
       - '--storage.tsdb.retention.time=200h'
       - '--web.enable-lifecycle'
     restart: unless-stopped
-    ports: [9090]
+    # ports: [9090]
+    expose:
+      - '9090'
 
     labels:
       org.label-schema.group: "monitoring"
@@ -39,7 +41,9 @@ services:
       - '--config.file=/etc/alertmanager/config.yml'
       - '--storage.path=/alertmanager'
     restart: unless-stopped
-    ports: [9093]
+    # ports: [9093]
+    expose:
+      - '9093'
     labels:
       org.label-schema.group: "monitoring"
 
@@ -56,7 +60,9 @@ services:
       - '--path.sysfs=/host/sys'
       - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
     restart: unless-stopped
-    ports: [9100]
+    # ports: [9100]
+    expose:
+      - '9100'
 
     labels:
       org.label-schema.group: "monitoring"
@@ -74,7 +80,9 @@ services:
       - /var/lib/docker:/var/lib/docker:ro
       #- /cgroup:/cgroup:ro #doesn't work on MacOS only for Linux
     restart: unless-stopped
-    ports: [8085]
+    # ports: [8085]
+    expose:
+      - '8085'
 
     labels:
       org.label-schema.group: "monitoring"
