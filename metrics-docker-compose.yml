@@ -95,7 +95,7 @@ services:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
       - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
-    env_file: .env
+    env_file: ../enviroments/.env-metrics
     restart: unless-stopped
     expose:
       - "3000"
