@@ -1,9 +1,4 @@
-version: '2.1'
-
-networks:
-  default:
-    external: true
-    name: traefiknet
+version: '3'
 
 volumes:
     prometheus_data: {}
@@ -30,7 +25,8 @@ services:
       - '9090'
     labels:
       org.label-schema.group: "monitoring"
-
+    networks:
+      - traefiknet
   alertmanager:
     image: prom/alertmanager:v0.25.0
     container_name: alertmanager
@@ -46,6 +42,8 @@ services:
       - '9093'
     labels:
       org.label-schema.group: "monitoring"
+    networks:
+      - traefiknet
 
   nodeexporter:
     image: prom/node-exporter:v1.5.0
@@ -66,6 +64,8 @@ services:
       - '9100'
     labels:
       - "org.label-schema.group=monitoring"
+    networks:
+      - traefiknet
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.47.1
@@ -84,7 +84,8 @@ services:
     # ports: [8085]
     expose:
       - '8085'
-
+    networks:
+      - traefiknet
     labels:
       org.label-schema.group: "monitoring"
 
@@ -99,12 +100,19 @@ services:
     restart: unless-stopped
     expose:
       - "3000"
+    networks:
+      - traefiknet
     labels:
       - "org.label-schema.group=monitoring"
       - "traefik.enable=true"
       - "traefik.http.routers.grafana.entrypoints=websecure"
       - "traefik.http.routers.grafana.rule=Host(`metrics.oup-analytics.ru`)"
       - "traefik.http.routers.grafana.tls.certresolver=myresolver"
+      - "traefik.docker.network=traefiknet"
+
+networks:
+  traefiknet:
+    external: true
 
   # pushgateway:
   #   image: prom/pushgateway:v1.5.1
