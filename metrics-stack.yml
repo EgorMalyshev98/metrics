@@ -20,7 +20,8 @@ services:
       - '--storage.tsdb.retention.time=200h'
       - '--web.enable-lifecycle'
     restart: unless-stopped
-    # ports: [9090]
+    ports: 
+      - "9090:9090"
     expose:
       - '9090'
     labels:
@@ -59,13 +60,26 @@ services:
       - '--path.sysfs=/host/sys'
       - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
     restart: unless-stopped
-    # ports: [9100]
-    expose:
-      - '9100'
+    ports: 
+      - "9100:9100"
     labels:
       - "org.label-schema.group=monitoring"
     networks:
       - traefiknet
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter
+    ports:
+      - 9187:9187
+    env_file: ../enviroments/.env-metrics
+    networks:
+      - traefiknet
+      - superset_superset
+    labels:
+      - "org.label-schema.group=monitoring"
+    links:
+      - postgres
+      - prometheus
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.47.1
@@ -90,7 +104,7 @@ services:
       org.label-schema.group: "monitoring"
 
   grafana:
-    image: grafana/grafana:9.5.1
+    image: grafana/grafana:10.4.1-ubuntu
     container_name: grafana
     volumes:
       - grafana_data:/var/lib/grafana
@@ -99,19 +113,21 @@ services:
     env_file: ../enviroments/.env-metrics
     restart: unless-stopped
     ports:
-      - "9442:9442"
+      - "3000:3000"
     networks:
       - traefiknet
     labels:
       - "org.label-schema.group=monitoring"
-      - "traefik.enable=true"
-      - "traefik.http.routers.grafana.entrypoints=websecure"
-      - "traefik.http.routers.grafana.rule=Host(`metrics.oup-analytics.ru`)"
-      - "traefik.http.routers.grafana.tls.certresolver=myresolver"
-      - "traefik.docker.network=traefiknet"
+    #   - "traefik.enable=true"
+    #   - "traefik.http.routers.grafana.entrypoints=websecure"
+    #   - "traefik.http.routers.grafana.rule=Host(`metrics.oup-analytics.ru`)"
+    #   - "traefik.http.routers.grafana.tls.certresolver=myresolver"
+    #   - "traefik.docker.network=traefiknet"
 
 networks:
   traefiknet:
+    external: true
+  superset_superset:
     external: true
 
   # pushgateway:
